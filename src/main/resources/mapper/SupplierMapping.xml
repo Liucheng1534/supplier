@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 1、创建一个mapper,命名空间为customer的全类名 -->
+<mapper namespace="ruantong.supplier.Dao.SupplierDao">
+
+	<resultMap id="SupplierMap" type="ruantong.supplier.Bean.Supplier">
+		<id column="supplier_id"  property="supplierid" />
+		<result column="supplier_name"  property="suppliername" />
+		<result column="supply_legaler" property="supplylegaler" />
+		<result column="businesser" property="businesser" />
+		<result column="phone_number" property="phonenumber" />
+		<result column="license_id" property="licenseid" />
+		<result column="revenue_id" property="revenueid" />
+		<result column="register_time" property="registertime" />
+	</resultMap>
+	
+	<!-- 查询所有供应商信息-->
+	<select id="selectAll" resultMap="SupplierMap">	
+		select supplier_id, supplier_name, supply_legaler,
+		businesser,phone_number,license_id,revenue_id,register_time from supplier
+		<where>
+			<if test="null!= supplierid">
+				supplier_id like concat('%',#{supplierid},'%') 
+			</if>
+			<if test="null!= supplylegaler">
+				and supply_legaler like concat('%',#{supplylegaler},'%')
+			</if>
+		</where>
+		order by supplier_id desc
+		<if test="null!=startIndex  and null!=pageSize ">
+		limit ${startIndex},${pageSize}
+		</if>
+	</select>
+	
+	<select id="countAll" resultType="java.lang.Integer">
+		select count(supplier_id) from supplier
+	</select>
+	
+	<!-- 插入供应商信息 -->
+	<insert id="insert" parameterType="ruantong.supplier.Bean.Supplier">
+		insert into supplier(supplier_id,supplier_name, supply_legaler,businesser,
+		phone_number,license_id,revenue_id,register_time)values(#{supplierid},#{suppliername},
+		#{supplylegaler},#{businesser},#{phonenumber},#{licenseid},
+		#{revenueid},now())
+	</insert>
+	
+	<!-- 删除供应商信息 -->
+	<delete id="delete" parameterType="java.lang.String">
+		delete from supplier where supplier_id=#{supplierid}	
+	</delete>
+	
+	<!-- 修改供应商信息 -->
+	<update id="update" parameterType="ruantong.supplier.Bean.Supplier">
+		update supplier 
+		<set>
+				<if test="null != suppliername and ''!=suppliername">
+					supplier_name = #{suppliername },	
+				</if>
+				
+				<if test="null != supplylegaler and ''!=supplylegaler">
+					supply_legaler = #{supplylegaler },
+				</if>
+				
+				<if test="null != businesser and ''!=businesser">
+					businesser = #{businesser },
+				</if>
+				
+				<if test="null != phonenumber and ''!=phonenumber">
+					phone_number = #{phonenumber },
+				</if>
+				
+				<if test="null != licenseid and ''!=licenseid">
+					license_id = #{licenseid },
+				</if>
+				
+				<if test="null != revenueid and ''!=revenueid">
+					revenue_id = #{revenueid },
+				</if>
+		</set>
+		where supplier_id=#{supplierid}
+	</update>
+</mapper>
