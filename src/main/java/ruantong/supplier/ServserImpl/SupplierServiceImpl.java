@@ -6,12 +6,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ruantong.supplier.Bean.Supplier;
 import ruantong.supplier.Dao.SupplierDao;
 import ruantong.supplier.Servser.SupplierService;
+import ruantong.supplier.Util.PoiUtil;
 
 @Service
 public class SupplierServiceImpl implements SupplierService {
@@ -74,6 +76,22 @@ public class SupplierServiceImpl implements SupplierService {
 	public boolean update(Supplier supplier) {
 
 		return supplierDao.update(supplier);
+	}
+
+
+	/**
+	 * 导出表格模板
+	 */
+	@Override
+	public HSSFWorkbook export(Class c, List<Supplier> list, String sheetName) {
+		PoiUtil util = new PoiUtil();
+		HSSFWorkbook workbook = null;
+		try {
+			workbook = util.getWorkbook(c, list, sheetName);
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		return workbook;
 	}
 
 	/**

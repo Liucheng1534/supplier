@@ -1,19 +1,22 @@
 package com.test;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import javax.sql.DataSource;
 
+import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import ruantong.supplier.Bean.Supplier;
 import ruantong.supplier.Dao.SupplierDao;
 import ruantong.supplier.Dao.UserDao;
+import ruantong.supplier.Util.PoiUtil;
 
 public class TestSpring {
 
@@ -90,31 +93,27 @@ public class TestSpring {
 	}
 
 	@Test
-	public void testData6() {
-		Calendar calendar = Calendar.getInstance();
-		System.out.println(calendar.get(Calendar.YEAR));
-		System.out.println(calendar.get(Calendar.MONTH) + 1);
-		// ��ȡ��
-		int year = calendar.get(Calendar.YEAR);
-
-		// ��ȡ�£�������Ҫ��Ҫ�·ݵķ�ΧΪ0~11����˻�ȡ�·ݵ�ʱ����Ҫ+1���ǵ�ǰ�·�ֵ
-		int month = calendar.get(Calendar.MONTH) + 1;
-
-		// ��ȡ��
-		int day = calendar.get(Calendar.DAY_OF_MONTH);
-
-		// ��ȡʱ
-		int hour = calendar.get(Calendar.HOUR);
-		 int hour2 = calendar.get(Calendar.HOUR_OF_DAY); // 24Сʱ��ʾ
-
-		// ��ȡ��
-		int minute = calendar.get(Calendar.MINUTE);
-		// ��ȡ��
-		int second = calendar.get(Calendar.SECOND);
-		
-		int random = (int) (Math.random()*100);
-		String s = year+""+month+""+day+""+hour+""+minute+""+second+""+random;
-		String s2 = (new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
-		System.out.println(s2+random);
+	public void testData6() throws Exception {
+		PoiUtil poiUtil = new PoiUtil();
+        HSSFWorkbook workbook= null;
+        ArrayList<Supplier> suppliers = new ArrayList<Supplier>();
+        Supplier supplier = new Supplier();
+        supplier.setBusinesser("1");
+        supplier.setLicenseid("2");
+        supplier.setPhonenumber("3");
+        supplier.setRegistertime("4");
+        supplier.setRevenueid("5");
+        supplier.setSupplierid("6");
+        supplier.setSuppliername("7");
+        suppliers.add(supplier);
+        try {
+            workbook = poiUtil.getWorkbook(Supplier.class, suppliers, "test");
+        } catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+//将表格输出
+        FileOutputStream outputStream = new FileOutputStream(new File("d://供应商表格.xls"));
+        workbook.write(outputStream);
+        outputStream.close();
 	}
 }

@@ -1,15 +1,25 @@
 package ruantong.supplier.Bean;
 
 
+import ruantong.supplier.Util.Comment;
+
 public class Supplier {
 
+	@Comment("供应商编号")
 	private String supplierid;		//供应商编号
+	@Comment("供应商名称")
 	private String suppliername;	//供应商名称
+	@Comment("供应法定代表人")
 	private String supplylegaler;	//供应法定代表人
+	@Comment("业务联系人")
 	private String businesser;		//业务联系人
+	@Comment("联系方式")
 	private String phonenumber;		//联系方式
+	@Comment("营业执照编号")
 	private String licenseid;		//营业执照编号
+	@Comment("税务登记编号")
 	private String revenueid;		//税务登记编号
+	@Comment("注册时间")
 	private String registertime;	//注册时间
 	
 	public String getSupplierid() {
@@ -60,9 +70,8 @@ public class Supplier {
 	public void setRegistertime(String registertime) {
 		this.registertime = registertime;
 	}
-	public Supplier(String supplierid, String suppliername, String supplylegaler, String businesser, String phonenumber,
-			String licenseid, String revenueid, String registertime) {
-		super();
+
+	public Supplier(String supplierid, String suppliername, String supplylegaler, String businesser, String phonenumber, String licenseid, String revenueid, String registertime) {
 		this.supplierid = supplierid;
 		this.suppliername = suppliername;
 		this.supplylegaler = supplylegaler;
@@ -72,14 +81,14 @@ public class Supplier {
 		this.revenueid = revenueid;
 		this.registertime = registertime;
 	}
-	public Supplier() {
-		super();
-	}
+
 	@Override
 	public String toString() {
 		return "Supplier [supplierid=" + supplierid + ", suppliername=" + suppliername + ", supplylegaler="
 				+ supplylegaler + ", businesser=" + businesser + ", phonenumber=" + phonenumber + ", licenseid="
 				+ licenseid + ", revenueid=" + revenueid + ", registertime=" + registertime + "]";
 	}
-	
+
+	public Supplier() {
+	}
 }

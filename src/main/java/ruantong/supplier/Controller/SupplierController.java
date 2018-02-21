@@ -1,9 +1,12 @@
 package ruantong.supplier.Controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +16,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import ruantong.supplier.Bean.Supplier;
 import ruantong.supplier.Servser.SupplierService;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping(value="/supplier")
@@ -82,9 +88,22 @@ public class SupplierController {
 	
 	@RequestMapping(value="/test")
 	public String test(){
-		
-		
 		return "demo1-22";
+	}
+
+
+	@RequestMapping("/export")
+	public void export(String excelName, HttpServletResponse response){
+		ArrayList list = new ArrayList();
+		try {
+			HSSFWorkbook export = supplierService.export(Supplier.class,list , "supliier");
+			response.setHeader("Content-Disposition", "attachment;filename="+excelName);
+
+			ServletOutputStream outputStream = response.getOutputStream();
+			export.write(outputStream);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 }
