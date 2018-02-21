@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<script src="codebase/webix.js" type="text/javascript" charset="utf-8"></script>
+        <link rel="stylesheet" href="codebase/webix.css" type="text/css">
+        <link rel="stylesheet" type="text/css" href="css/samples.css">
+		<script src="js/testdata.js" type="text/javascript" charset="utf-8"></script>
+		<title></title>
+	</head>
+	<body>
+		<!--标题显示-->
+		<div class='biaoti' style="font-size: 30pt;position: relative;left:18px;top:20px;">内部供应商信息</div>
+		<!--注册按钮-->
+		<div id="zhuce" style="position: relative;right: 100px;"></div>
+		<br>
+		<!--数据内容显示-->
+		<div id="testA" style='width:300px;position: relative;top:-30px;'></div>
+		<!--页码显示-->
+		<div id="paging_here" style="position: relative;left: 895px;top:-20px;"></div>
+		<!-- ajax测试按钮 -->
+		<button id="ajaxbu">ajax</button>
+		<script type="text/javascript" charset="utf-8">
+		
+		//js获取项目根路径，如： http://localhost:8083/uimcardprj
+		function getRootPath(){
+		    //获取当前网址，如： http://localhost:8083/uimcardprj/share/meun.jsp
+		    var curWwwPath=window.document.location.href;
+		    //获取主机地址之后的目录，如： uimcardprj/share/meun.jsp
+		    var pathName=window.document.location.pathname;
+		    var pos=curWwwPath.indexOf(pathName);
+		    //获取主机地址，如： http://localhost:8083
+		    var localhostPaht=curWwwPath.substring(0,pos);
+		    //获取带"/"的项目名，如：/uimcardprj
+		    var projectName=pathName.substring(0,pathName.substr(1).indexOf('/')+1);
+		    return(localhostPaht+projectName);
+		}
+		var ajaxdata;
+// 		alert(getRootPath());
+		//ajax主要用来处理异步的问题.它也是客户端和服务器的中转。那么这里面的操作都是中转操作咯。也都是ajax对客户端和服务器的操作咯
+		window.onload = function(){
+			//给控件，添加一个点击事件
+// 			document.getElementById("ajaxbu").onclick=function(){//ajax在使用事件的时候，总是用onclick=function(){}的么
+//				alert("666666");
+				//1、调用方法，获得一个ajax对象
+				var xhr = getXMLHttpRequest();
+
+				/*状态值
+				* 0:表示初始化，还没有调用open方法
+				* 1：表示正在加载，open()方法已被调用，但send()方法没有被调用
+				* 2：表示已加载完成。send()方法被调用，请求已经开始
+				* 3：表示交互中。服务器正在发送响应
+				* 4：表示完成，响应发送完毕 
+				* 
+				* 错误状态码：
+				* 404:没有找到页面
+				* 403：禁止访问
+				* 500：内部服务器错误
+				* 200：一切正常
+				* 304：没有被修改，如果返回304表示访问成功，只是源文件没有被修改 
+				 */
+				//4、服务器对客户端的请求进行响应(监听客户端的请求情况)
+				xhr.onreadystatechange = function(){
+//					alert(xhr.readyState);//返回状态值0-4
+					if(xhr.readyState==4){
+						if(xhr.status==200||xhr.status==304){//xhr.status返回状态码
+//							alert("66666");
+							var data = xhr.responseText;//返回服务器发送给客户端的数据
+// 							alert(data);
+							ajaxdata = data;
+// 							alert(ajaxdata);
+							datashow();
+						}
+					}
+				};
+				//2、与服务器进行连接,open方法有三个参数(也可以有5个),1、请求方式，2、url，3、是否异步;这里的url是对服务器和客户端操作的servlet，还有一个jsp文件，是用来显示页面的。这个js文件是ajax，是对客户端请求，服务器响应的中转
+//				xhr.open("GET","./AjaxServlet1?a=1&b=2",true);//这里的地址有问题，不能使用映射的地址么.映射地址是/AjaxServlet1
+// 				xhr.open("post",""+getRootPath()+"/test/getAll?time="+new Date(),true);//设置客户端请求方式为post
+				xhr.open("GET",""+getRootPath()+"/supplier/getAll?time="+new Date(),true);//设置客户端请求方式为post
+				xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");//设置一个客户端请求的头部信息，好让服务器可以识别
+				//3、客户端对服务器发起请求()
+				xhr.send("a=1&b=2");
+// 			};
+			
+		};
+	
+		//创建XMLHttpRequest对象,相当于ajax对象
+		function getXMLHttpRequest() {
+			var xmlHttpReq = null;
+			if (window.XMLHttpRequest) {
+				xmlHttpReq = new XMLHttpRequest();//这句是创建XMLHttpRequest对象的重点
+			} else {
+				if (window.ActiveXObject) {
+					try {
+						xmlHttpReq = new ActiveXObject("Msxml2.XMLHTTP");
+					} catch (e) {
+						try {
+							xmlHttpReq = new ActiveXObject("Msxml2.XMLHTTP");
+						} catch (e) {
+
+						}
+					}
+				}
+			}
+			return xmlHttpReq;
+		};
+		
+		//修改弹窗显示
+		function myshow() {
+			$$("my_win").show();
+		}
+		
+		function xiugai(rank,title,year,votes,phone,yinye,suiwu){
+//			alert(title);
+			$$("my_win").show();
+			$$("t1").setValue(rank);
+			$$("t2").setValue(title);
+			$$("t3").setValue(year);
+			$$("t4").setValue(votes);
+			$$("t5").setValue(phone);
+			$$("t6").setValue(yinye);
+			$$("t7").setValue(suiwu);
+
+		}
+		
+		function removeData(){
+/*            if(!$$("data").getSelectedId()){
+                webix.message("No item is selected!");
+                return;
+            }
+			$$("data").remove($$("data").getSelectedId());*/
+			$$("data").remove($$("data").getSelectedId());
+		}
+
+		/*function xiugai(suiwu){
+			alert(suiwu);
+		}*/
+		var grida;
+		function datashow(){
+			
+// 			alert(ajaxdata);
+			grida = webix.ui({
+				container:"testA",	//div的ID
+				view:"datatable",	//组件类型
+				id:"data",
+				columns:[
+					{ id:"supplierid",	header:"供应商编号", 		width:50,	sort:"int",	css:"rank area"},
+					{ id:"suppliername",	header:"供应商名称",width:200,	sort:"string",css:"left_area"},
+					{ id:"supplylegaler",	header:"供应法定代表人" , width:80,	sort:"int",css:"left_area"},
+					{ id:"businesser",	header:"业务联系人", 	width:100,	sort:"int",css:"left_area"},
+					{ id:"phonenumber",	header:"联系方式",width:200,	sort:"string",css:"left_area"},
+					{ id:"licenseid",	header:"营业执照编号",width:200,	sort:"string",css:"left_area"},
+					{ id:"revenueid",	header:"税务登记编号",width:200,	sort:"string",css:"left_area"},
+					{ id:"caozuo",	header:"操作",width:200,	sort:"string",css:"left_area",
+					template:`&#160;<button type="button" onclick="setData(#supplierid#,'#suppliername#','#supplylegaler#','#businesser#','#phonenumber#','#licenseid#','#revenueid#')" class="webix_pager_item">修改</button>&#160;&#160;&#160;&#160;&#160;&#160;
+					<button type="button" onclick="deleteData(#supplierid#)" class="webix_pager_item">删除</button>`}
+//template:"<button type=\"button\" onclick=\"xiugai('#title#')\">修改</button>"},
+				],
+//				select:"row",		//按行选中么
+//				select:1,
+// 				select:true,
+				autowidth:true,		//字适应宽度
+				yCount:10,		//10行的高度
+				scrollY:false,	//滚动条
+				navigation:"true",		
+
+				pager:{
+					container:"paging_here",	//显示分页的div的id
+					id:"pager",
+					size:10,	//一次显示10行
+					group:5,		//一行显示5个页码
+					template: '{common.first()} {common.prev()} {common.pages()} {common.next()} {common.last()} {common.count()} '
+				},
+				data: ajaxdata	//数据的调用
+			});
+			
+		}
+		
+		webix.ready(function(){
+			
+			webix.ui({
+				container:"zhuce",view:"button", id:"my_button", 
+				value:"内部供应商注册", inputWidth:150 ,align:"right",
+				click:function(){
+					$$("my_win").show();
+				}
+			});
+			
+			
+			
+//			xiugai(#rank#,'#title#',#year#,#votes#,#phone#,#yinye#,'#suiwu#')
+			/* grida = webix.ui({
+				container:"testA",	//div的ID
+				view:"datatable",	//组件类型
+				id:"data",
+				columns:[
+					{ id:"rank",	header:"供应商编号", 		width:50,	sort:"int",	css:"rank area"},
+					{ id:"title",	header:"供应商名称",width:200,	sort:"string",css:"left_area"},
+					{ id:"year",	header:"供应法定代表人" , width:80,	sort:"int",css:"left_area"},
+					{ id:"votes",	header:"业务联系人", 	width:100,	sort:"int",css:"left_area"},
+					{ id:"phone",	header:"联系方式",width:200,	sort:"string",css:"left_area"},
+					{ id:"yinye",	header:"营业执照编号",width:200,	sort:"string",css:"left_area"},
+					{ id:"suiwu",	header:"税务登记编号",width:200,	sort:"string",css:"left_area"},
+					{ id:"caozuo",	header:"操作",width:200,	sort:"string",css:"left_area",
+					template:`&#160;<button type="button" onclick="myshow()" class="webix_pager_item">修改</button>&#160;&#160;&#160;&#160;&#160;&#160;
+					<button type="button" onclick="removeData()" class="webix_pager_item">删除</button>`}
+//template:"<button type=\"button\" onclick=\"xiugai('#title#')\">修改</button>"},
+				],
+//				select:"row",		//按行选中么
+//				select:1,
+// 				select:true,
+				autowidth:true,		//字适应宽度
+				yCount:10,		//10行的高度
+				scrollY:false,	//滚动条
+				navigation:"true",		
+
+				pager:{
+					container:"paging_here",	//显示分页的div的id
+					size:10,	//一次显示10行
+					group:5,		//一行显示5个页码
+					template: '{common.first()} {common.prev()} {common.pages()} {common.next()} {common.last()} {common.count()} '
+				},
+				data:big_film_set2	//数据的调用
+			});	 */
+			
+	//弹窗显示		
+	zc = webix.ui({
+	view:"window", move:true,id:"my_win", position:"center",width:600,
+    head:{view:"toolbar",
+    	margin:-4,
+    	cols:[{
+    		view:"label",
+    		label:"内部供应商注册"
+    	},{
+    		view:"icon",
+    		icon:"times-circle",
+    		click:"$$('my_win').hide();"
+    	}]
+    
+    },
+   
+	body:{
+		view:"form",
+		id: "form1",
+		borderless:true,
+		elements:[
+// 			{id:"t1",view:"text",label:'供应商编号:',labelWidth:130,name:"rank"},
+			{id:"t2",view:"text",label:'供应商名称:',labelWidth:130,name:"suppliername"},
+			{id:"t3",view:"text",label:'供应法定代表人:',labelWidth:130,name:"supplylegaler"},
+			{id:"t4",view:"text",label:'业务联系人:',labelWidth:130,name:"businesser"},
+			{id:"t5",view:"text",label:'联系方式:',labelWidth:130,name:"phonenumber"},
+			{id:"t6",view:"text",label:'营业执照编号:',labelWidth:130,name:"licenseid"},
+			{id:"t7",view:"text",label:'税务登记编号:',labelWidth:130,name:"revenueid"},
+//			{id:"t8",view:"text",label:'操作:',labelWidth:130,name:"caozuo"},
+			{cols:[
+// 				{view:"button", type:"form",inputWidth:200,value:"保存",align:"right",click:("$$('my_win').hide();alert('保存成功！')")},
+				{view:"button", type:"form",inputWidth:200,value:"保存",align:"right",click:("getValue()")},
+				{view:"button",value:"重置",inputWidth:200,align:"right",click:"$$('form1').clear();"},
+				]
+				
+			}
+		]
+		
+	}
+}).hide();
+// $$('form1').bind('data');// 数据绑定
+		});
+		
+		function getData(){
+			//1、调用方法，获得一个ajax对象
+			var xhr = getXMLHttpRequest();
+
+			//4、服务器对客户端的请求进行响应(监听客户端的请求情况)
+			xhr.onreadystatechange = function(){
+				if(xhr.readyState==4){
+					if(xhr.status==200||xhr.status==304){//xhr.status返回状态码
+						var data = xhr.responseText;//返回服务器发送给客户端的数据
+						ajaxdata = data;
+						datashow();
+					}
+				}
+			};
+			xhr.open("post",""+getRootPath()+"/supplier/getAll?time="+new Date(),true);//设置客户端请求方式为post
+			xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");//设置一个客户端请求的头部信息，好让服务器可以识别
+			//3、客户端对服务器发起请求()
+			xhr.send("a=1&b=2");
+		}
+		
+		//添加数据
+		function getValue(){
+			var suppliername = $$("t2").getValue();
+			var supplylegaler = $$("t3").getValue();
+			var businesser = $$("t4").getValue();
+			var phonenumber = $$("t5").getValue();
+			var licenseid = $$("t6").getValue();
+			var revenueid = $$("t7").getValue();
+// 			alert(suppliername);
+// 			window.onload = function(){
+				
+					//1、调用方法，获得一个ajax对象
+					var xhr = getXMLHttpRequest();
+
+					//4、服务器对客户端的请求进行响应(监听客户端的请求情况)
+					xhr.onreadystatechange = function(){
+//						alert(xhr.readyState);//返回状态值0-4
+						if(xhr.readyState==4){
+							if(xhr.status==200||xhr.status==304){//xhr.status返回状态码
+//								alert("66666");
+								var data = xhr.responseText;//返回服务器发送给客户端的数据
+								if(judge==1){
+									alert("修改成功!");
+								}
+								else{
+									alert("注册成功!");
+								}
+//	 							alert(data);
+								
+								$$("my_win").hide();
+								grida = null;
+								$$("data").hide();
+								$$("pager").hide();
+								$$('form1').clear();
+// 								$$("data").show();
+//	 							alert(ajaxdata);
+								getData();
+// 								alert("111!");
+							}else{
+								if(judge==1){
+									alert("修改失败!");
+								}
+								else{
+									alert("注册失败!");
+								}
+							}
+							
+						  }
+					   }
+					
+// 					alert(judge);
+					//2、与服务器进行连接,open方法有三个参数(也可以有5个),1、请求方式，2、url，3、是否异步;这里的url是对服务器和客户端操作的servlet，还有一个jsp文件，是用来显示页面的。这个js文件是ajax，是对客户端请求，服务器响应的中转
+					if(judge==1){
+// 						alert(supplieid);
+						xhr.open("post",""+getRootPath()+"/supplier/update",true);//设置客户端请求方式为post
+					}else{
+						xhr.open("post",""+getRootPath()+"/supplier/insert",true);
+					}
+					
+					xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");//设置一个客户端请求的头部信息，好让服务器可以识别
+					//3、客户端对服务器发起请求()
+					xhr.send("supplieird="+supplieid+"&suppliername="+suppliername+"&supplylegaler="+supplylegaler+"&businesser="+businesser+"&phonenumber="+phonenumber+"&licenseid="+licenseid+"&revenueid="+revenueid);
+			};
+			
+			//删除数据
+			function deleteData(id){
+						//1、调用方法，获得一个ajax对象
+						var xhr = getXMLHttpRequest();
+
+						//4、服务器对客户端的请求进行响应(监听客户端的请求情况)
+						xhr.onreadystatechange = function(){
+//							alert(xhr.readyState);//返回状态值0-4
+							if(xhr.readyState==4){
+								if(xhr.status==200||xhr.status==304){//xhr.status返回状态码
+//									alert("66666");
+									var data = xhr.responseText;//返回服务器发送给客户端的数据
+//		 							alert(data);
+									alert("删除成功!");
+									$$("my_win").hide();
+									grida = null;
+									$$("data").hide();
+									$$("pager").hide();
+									$$('form1').clear();
+//	 								$$("data").show();
+//		 							alert(ajaxdata);
+									getData();
+								}else{
+									alert("删除失败!");
+								}
+								
+								}
+							}
+						//2、与服务器进行连接,open方法有三个参数(也可以有5个),1、请求方式，2、url，3、是否异步;这里的url是对服务器和客户端操作的servlet，还有一个jsp文件，是用来显示页面的。这个js文件是ajax，是对客户端请求，服务器响应的中转
+						xhr.open("post",""+getRootPath()+"/supplier/delete",true);//设置客户端请求方式为post
+						xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");//设置一个客户端请求的头部信息，好让服务器可以识别
+						//3、客户端对服务器发起请求()
+						xhr.send("supplierid="+id);
+				};
+				
+				var judge = 0;
+				var supplieid = 0;
+				function setData(supplierid,suppliername,supplylegaler,businesser,phonenumber,licenseid,revenueid){
+					supplieid = supplierid;
+// 					alert(supplieid);
+					$$("my_win").show();
+					$$("t2").setValue(suppliername);
+					$$("t3").setValue(supplylegaler);
+					$$("t4").setValue(businesser);
+					$$("t5").setValue(phonenumber);
+					$$("t6").setValue(licenseid);
+					$$("t7").setValue(revenueid);
+					judge = 1;
+				}
+		</script>
+	</body>
+</html>

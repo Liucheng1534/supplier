@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<script src="../codebase/webix.js" type="text/javascript" charset="utf-8"></script>
+        <link rel="stylesheet" href="../codebase/webix.css" type="text/css">
+        <link rel="stylesheet" type="text/css" href="../css/samples.css">
+		<script src="../js/testdata.js" type="text/javascript" charset="utf-8"></script>
+		<title></title>
+	</head>
+	<body>
+		<!--标题显示-->
+		<div class='biaoti' style="font-size: 30pt;position: relative;left:18px;top:20px;">内部供应商信息</div>
+		<!--注册按钮-->
+		<div id="zhuce" style="position: relative;right: 100px;"></div>
+		<br>
+		<!--数据内容显示-->
+		<div id="testA" style='width:300px;position: relative;top:-30px;'></div>
+		<!--页码显示-->
+		<div id="paging_here" style="position: relative;left: 895px;top:-20px;"></div>
+		<div id="content" style="position: relative;left: 895px;top:-10px;"></div>
+		<!-- ajax测试按钮 -->
+		<button id="ajaxb" onclick="getData2()">ajax</button>
+		<script type="text/javascript" charset="utf-8">
+		function getData2(){
+			 webix.ajax().get(""+getRootPath()+"/supplier/getAll",{
+				    error:function(text, data, XmlHttpRequest){
+				        alert("error");
+				    },
+				    success:function(text, data, XmlHttpRequest){
+				    	console.log(eval(text));
+				        alert("success");
+				    }
+				});
+			
+		}
+		
+		//js获取项目根路径，如： http://localhost:8083/uimcardprj
+		function getRootPath(){
+		    //获取当前网址，如： http://localhost:8083/uimcardprj/share/meun.jsp
+		    var curWwwPath=window.document.location.href;
+		    //获取主机地址之后的目录，如： uimcardprj/share/meun.jsp
+		    var pathName=window.document.location.pathname;
+		    var pos=curWwwPath.indexOf(pathName);
+		    //获取主机地址，如： http://localhost:8083
+		    var localhostPaht=curWwwPath.substring(0,pos);
+		    //获取带"/"的项目名，如：/uimcardprj
+		    var projectName=pathName.substring(0,pathName.substr(1).indexOf('/')+1);
+		    return(localhostPaht+projectName);
+		}
+		
+		var totalPage; 
+		var ajaxdata;
+		//ajax主要用来处理异步的问题.它也是客户端和服务器的中转。
+		window.onload = function(){
+			webix.ajax().get(""+getRootPath()+"/supplier/getAll", function(text, xml, xhr){
+				var dataJson = eval("("+text+")");
+				ajaxdata = dataJson.data;
+				totalPage = dataJson.totalPage;
+// 				console.log(text.totalPage);
+			    datashow();
+// 			    console.log(eval("("+text+")").totalPage);
+			});
+		};
+	
+		//修改弹窗显示
+		function myshow() {
+			$$("my_win").show();
+		}
+		
+		function test(){
+			alert("666");
+		}
+		//setData('#supplierid#','#suppliername#','#supplylegaler#','#businesser#','#phonenumber#','#licenseid#','#revenueid#')
+		//数据显示
+		var grida;
+		function datashow(){
+			
+			grida = webix.ui({
+				container:"testA",	//div的ID
+				view:"datatable",	//组件类型
+				id:"data",
+				columns:[
+					{ id:"supplierid",	header:"供应商编号", 		width:50,	sort:"string",	css:"rank area"},
+					{ id:"suppliername",	header:"供应商名称",width:200,	sort:"string",css:"left_area"},
+					{ id:"supplylegaler",	header:"供应法定代表人" , width:80,	sort:"string",css:"left_area"},
+					{ id:"businesser",	header:"业务联系人", 	width:100,	sort:"string",css:"left_area"},
+					{ id:"phonenumber",	header:"联系方式",width:200,	sort:"string",css:"left_area"},
+					{ id:"licenseid",	header:"营业执照编号",width:200,	sort:"string",css:"left_area"},
+					{ id:"revenueid",	header:"税务登记编号",width:200,	sort:"string",css:"left_area"},
+					{ id:"caozuo",	header:"操作",width:200,	sort:"string",css:"left_area",
+					template:`&#160;<button type="button" onclick="setData('666','666','666','666','666','666','666')" class="webix_pager_item">修改</button>&#160;&#160;&#160;&#160;&#160;&#160;
+					<button type="button" onclick="deleteData(\#supplierid\#)" class="webix_pager_item">删除</button>`}
+//template:"<button type=\"button\" onclick=\"xiugai('#title#')\">修改</button>"},
+				],
+//				select:"row",		//按行选中么
+//				select:1,
+// 				select:true,
+				autowidth:true,		//字适应宽度
+				yCount:10,		//10行的高度
+				scrollY:false,	//滚动条
+				navigation:"true",		
+
+				pager:{
+					container:"paging_here",	//显示分页的div的id
+					id:"pager",
+					size:10,	//一次显示10行
+					group:5,		//一行显示5个页码
+					page:1,
+					on: {
+						"onItemClick": function(startRow){
+						var currentPage = Math.ceil(startRow/10)+1;
+// 						alert(currentPage);
+						webix.ajax().get(""+getRootPath()+"/supplier/getAll",{
+					
+							currpage: currentPage,
+							pageSize:10
+						},
+					function(text){
+//					console.log(text);
+					var result = JSON.parse(text);
+					var table = $$("data");
+					table.clearAll();
+// 					console.log(result);
+					result.data.forEach(function(item){
+						table.add(item);
+					});
+					document.getElementById("content").innerHTML = "当前第" + currentPage + "页,总共" + totalPage + "页";
+					table.config.pager.page = currentPage-1;
+					table.config.pager.count = totalPage*10;
+					table.getPager().refresh();
+				});
+					}
+				},
+					template: '{common.first()} {common.prev()} {common.pages()} {common.next()} {common.last()}  '
+				},
+				data: ajaxdata	//数据的调用
+			});
+			grida.config.pager.count = totalPage*10;
+			grida.getPager().refresh();
+		}
+		
+		webix.ready(function(){
+			
+			webix.ui({
+				container:"zhuce",view:"button", id:"my_button", 
+				value:"内部供应商注册", inputWidth:150 ,align:"right",
+				click:function(){
+					$$("t6").setValue(getRound());
+					$$("t7").setValue(getRound());
+					$$("my_win").show();
+				}
+			});
+			
+			function getRound(){
+				var r = Math.round(Math.random()*10000).toString();
+				var d = new Date();
+				var y = d.getFullYear().toString();
+				var m = d.getMonth() + 1;
+				if(m < 10){
+					m = "0" + m.toString();
+				}
+				var dd = d.getDate().toString();
+				var ymdr = y + m + dd + r;
+				return ymdr;
+			}
+	alert(getRound());		
+	//弹窗显示		
+	zc = webix.ui({
+	view:"window", move:true,id:"my_win", position:"center",width:600,
+    head:{view:"toolbar",
+    	margin:-4,
+    	cols:[{
+    		view:"label",
+    		label:"内部供应商注册"
+    	},{
+    		view:"icon",
+    		icon:"times-circle",
+    		click:"$$('my_win').hide();"
+    	}]
+    
+    },
+   
+	body:{
+		view:"form",
+		id: "form1",
+		borderless:true,
+		elements:[
+			{id:"t2",view:"text",label:'供应商名称:',labelWidth:130,name:"suppliername"},
+			{id:"t3",view:"text",label:'供应法定代表人:',labelWidth:130,name:"supplylegaler"},
+			{id:"t4",view:"text",label:'业务联系人:',labelWidth:130,name:"businesser"},
+			{id:"t5",view:"text",label:'联系方式:',labelWidth:130,name:"phonenumber"},
+			{id:"t6",view:"text",label:'营业执照编号:',labelWidth:130,name:"licenseid"},
+			{id:"t7",view:"text",label:'税务登记编号:',labelWidth:130,name:"revenueid"},
+			{cols:[
+				{view:"button",type:"form",inputWidth:200,value:"保存",align:"left",click:("insertData()")},
+				{view:"button",value:"重置",inputWidth:200,align:"right",click:"$$('form1').clear();"},
+				]
+				
+			}
+		]
+		
+	}
+}).hide();
+		});
+		
+		//查询数据
+		function getData(){
+			webix.ajax().get(""+getRootPath()+"/supplier/getAll", { filter : "123" }, function(text, xml, xhr){
+			    ajaxdata = eval("("+text+")").data;
+			    datashow();
+			}); 
+		}
+// 		xhr.send("supplieird="+supplieid+"&suppliername="+suppliername+"&supplylegaler="+supplylegaler+"&businesser="+businesser+"&phonenumber="+phonenumber+"&licenseid="+licenseid+"&revenueid="+revenueid); */
+
+		//添加和保存数据
+		function insertData(){
+			var suppliername = $$("t2").getValue();
+			var supplylegaler = $$("t3").getValue();
+			var businesser = $$("t4").getValue();
+			var phonenumber = $$("t5").getValue();
+			var licenseid = $$("t6").getValue();
+			var revenueid = $$("t7").getValue();
+			/* var formData = new FormData();
+			formData.append("supplieird", supplieid);
+			formData.append("suppliername", ""+suppliername+"");
+			formData.append("supplylegaler", supplylegaler);
+			formData.append("businesser", businesser);
+			formData.append("phonenumber", phonenumber);
+			formData.append("licenseid", licenseid);
+			formData.append("revenueid", revenueid); */
+			var data = {"supplieird":supplieid,"suppliername":suppliername,"supplylegaler":supplylegaler
+					,"businesser":businesser,"phonenumber":phonenumber,"licenseid":licenseid,"revenueid":revenueid}
+			if(judge==1){
+				webix.ajax().put(""+getRootPath()+"/supplier/update?supplieird="+supplieid+"&suppliername="+suppliername+"&supplylegaler="+supplylegaler+"&businesser="+businesser+"&phonenumber="+phonenumber+"&licenseid="+licenseid+"&revenueid="+revenueid,{
+				    error:function(text, x, XmlHttpRequest){
+				    	alert("修改失败!");
+				    },
+				    success:function(text, x, XmlHttpRequest){
+				    	if(text=="true"){
+				    		$$("my_win").hide();
+							grida = null;
+							$$("data").hide();
+							$$("pager").hide();
+							$$('form1').clear();
+							getData();
+							alert("修改成功!");
+				    	}else{
+				    		alert("修改失败!");
+				    	}
+				    }
+				}); 
+			}
+			else{
+				webix.ajax().post(""+getRootPath()+"/supplier/insert",data,{
+				    error:function(text, x, XmlHttpRequest){
+				        alert("注册失败!");
+				    },
+				    success:function(text, x, XmlHttpRequest){
+				    	if(text=="true"){
+					        $$("my_win").hide();
+							grida = null;
+							$$("data").hide();
+							$$("pager").hide();
+							$$('form1').clear();
+							getData();
+							alert("注册成功!");
+				    	}else{
+				    		alert("注册失败!");
+				    	}
+				    }
+				});
+			  }
+		    };
+		    
+		    //数据回显
+			var judge = 0;
+			var supplieid = 0;
+			function setData(supplierid,suppliername,supplylegaler,businesser,phonenumber,licenseid,revenueid){
+				alert("666");
+				supplieid = supplierid;
+				$$("my_win").show();
+				$$("t2").setValue(suppliername);
+				$$("t3").setValue(supplylegaler);
+				$$("t4").setValue(businesser);
+				$$("t5").setValue(phonenumber);
+				$$("t6").setValue(licenseid);
+				$$("t7").setValue(revenueid);
+				judge = 1;
+				alert("777");
+			}
+// 			alert("777");
+			//删除数据
+			function deleteData(id){
+				
+				webix.ajax().del(""+getRootPath()+"/supplier/delete?supplierid="+id,{
+				    error:function(text, x, XmlHttpRequest){
+				        alert("删除失败!");
+				    },
+				    success:function(text, x, XmlHttpRequest){
+				    	if(text=="true"){
+					        $$("my_win").hide();
+							grida = null;
+							$$("data").hide();
+							$$("pager").hide();
+							$$('form1').clear();
+							getData();
+							alert("删除成功!");
+				    	}else{
+				    		alert("删除失败!");
+				    	}
+				    }
+				});
+			};
+				
+		</script>
+	</body>
+</html>

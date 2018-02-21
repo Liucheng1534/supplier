@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<script src="codebase/webix.js" type="text/javascript" charset="utf-8"></script>
+        <link rel="stylesheet" href="codebase/webix.css" type="text/css">
+        <link rel="stylesheet" type="text/css" href="css/samples.css">
+		<script src="js/testdata.js" type="text/javascript" charset="utf-8"></script>
+		<title></title>
+	</head>
+	<body>
+		<!--标题显示-->
+		<div class='biaoti' style="font-size: 30pt;position: relative;left:18px;top:20px;">内部供应商信息</div>
+		<!--注册按钮-->
+		<div id="zhuce" style="position: relative;right: 100px;"></div>
+		<br>
+		<!--数据内容显示-->
+		<div id="testA" style='width:300px;position: relative;top:-30px;'></div>
+		<!--页码显示-->
+		<div id="paging_here" style="position: relative;left: 895px;top:-20px;"></div>
+		<div id="paging_here2" style="position: relative;left: 895px;top:-10px;"></div>
+		<div id="content" style="position: relative;left: 895px;top:-10px;"></div>
+		
+		<script type="text/javascript" charset="utf-8">
+		
+		function myshow() {
+			$$("my_win").show();
+		}
+		
+		function xiugai(rank,title,year,votes,phone,yinye,suiwu){
+//			alert(title);
+			$$("my_win").show();
+			$$("t1").setValue(rank);
+			$$("t2").setValue(title);
+			$$("t3").setValue(year);
+			$$("t4").setValue(votes);
+			$$("t5").setValue(phone);
+			$$("t6").setValue(yinye);
+			$$("t7").setValue(suiwu);
+
+		}
+		
+		function removeData(){
+/*            if(!$$("data").getSelectedId()){
+                webix.message("No item is selected!");
+                return;
+            }
+			$$("data").remove($$("data").getSelectedId());*/
+			$$("data").remove($$("data").getSelectedId());
+		}
+
+		/*function xiugai(suiwu){
+			alert(suiwu);
+		}*/
+		
+		webix.ready(function(){
+			
+			webix.ui({
+				container:"zhuce",view:"button", id:"my_button", 
+				value:"内部供应商注册", inputWidth:150 ,align:"right",
+				click:function(){
+					$$("my_win").show();
+				}
+			});
+			
+//			xiugai(#rank#,'#title#',#year#,#votes#,#phone#,#yinye#,'#suiwu#')
+			grida = webix.ui({
+				container:"testA",	//div的ID
+				view:"datatable",	//组件类型
+				id:"data",
+				columns:[
+					{ id:"rank",	header:"供应商编号", 		width:50,	sort:"int",	css:"rank area"},
+					{ id:"title",	header:"供应商名称",width:200,	sort:"string",css:"left_area"},
+					{ id:"year",	header:"供应法定代表人" , width:80,	sort:"int",css:"left_area"},
+					{ id:"votes",	header:"业务联系人", 	width:100,	sort:"int",css:"left_area"},
+					{ id:"phone",	header:"联系方式",width:200,	sort:"string",css:"left_area"},
+					{ id:"yinye",	header:"营业执照编号",width:200,	sort:"string",css:"left_area"},
+					{ id:"suiwu",	header:"税务登记编号",width:200,	sort:"string",css:"left_area"},
+					{ id:"caozuo",	header:"操作",width:200,	sort:"string",css:"left_area",
+					template:`&#160;<button type="button" onclick="myshow()" class="webix_pager_item">修改</button>&#160;&#160;&#160;&#160;&#160;&#160;
+					<button type="button" onclick="removeData()" class="webix_pager_item">删除</button>`}
+//template:"<button type=\"button\" onclick=\"xiugai('#title#')\">修改</button>"},
+				],
+//				select:"row",		//按行选中么
+//				select:1,
+// 				select:true,
+				autowidth:true,		//字适应宽度
+				yCount:10,		//10行的高度
+				scrollY:false,	//滚动条
+				navigation:"true",		
+				
+				pager:{
+					container:"paging_here",	//显示分页的div的id
+					size:10,	//一次显示10行
+					group:5,		//一行显示5个页码
+					template: '{common.first()} {common.prev()} {common.pages()} {common.next()} {common.last()} {common.count()} '
+				},
+				data:big_film_set2	//数据的调用
+			});
+			grida.config.pager.count = 55;
+			grida.getPager().refresh();
+			var count = webix.ui({
+				container:"content",
+				view:"label",
+				minWidth:200,
+				label:"当前页"+(grida.getPage()+1)
+			});
+// 			alert(grida.getPage());
+	zc = webix.ui({
+	view:"window", move:true,id:"my_win", position:"center",width:600,
+    head:{view:"toolbar",
+    	margin:-4,
+    	cols:[{
+    		view:"label",
+    		label:"内部供应商注册"
+    	},{
+    		view:"icon",
+    		icon:"times-circle",
+    		click:"$$('my_win').hide();"
+    	}]
+    
+    },
+	body:{
+		view:"form",
+		id: "form1",
+		borderless:true,
+		elements:[
+			{id:"t1",view:"text",label:'供应商编号:',labelWidth:130,name:"rank"},
+			{id:"t2",view:"text",label:'供应商名称:',labelWidth:130,name:"title"},
+			{id:"t3",view:"text",label:'供应法定代表人:',labelWidth:130,name:"year"},
+			{id:"t4",view:"text",label:'业务联系人:',labelWidth:130,name:"votes"},
+			{id:"t5",view:"text",label:'联系方式:',labelWidth:130,name:"phone"},
+			{id:"t6",view:"text",label:'营业执照编号:',labelWidth:130,name:"yinye"},
+			{id:"t7",view:"text",label:'税务登记编号:',labelWidth:130,name:"suiwu"},
+//			{id:"t8",view:"text",label:'操作:',labelWidth:130,name:"caozuo"},
+			{cols:[
+				{view:"button", type:"form",inputWidth:200,value:"保存",align:"right",click:("$$('my_win').hide();alert('保存成功！')")},
+				{view:"button",value:"重置",inputWidth:200,align:"right",click:"$$('form1').clear();"},
+				]
+				
+			}
+		]
+		
+	}
+}).hide();
+$$('form1').bind('data');// 数据绑定
+		});
+		
+		</script>
+	</body>
+</html>

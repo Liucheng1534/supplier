@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>login</title>
+		<script src="../codebase/webix.js" type="text/javascript" charset="utf-8"></script>
+        <link rel="stylesheet" href="../codebase/webix.css" type="text/css">
+        <link rel="stylesheet" type="text/css" href="../css/samples.css">
+		<script src="../js/testdata.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<style>
+.myClass {
+    position:relative;
+    left:-2px;
+}
+.myClass2 {
+    position:relative;
+    left:0px;
+    top:5px;
+}
+</style>
+<body style="background: #4e5359 url(../img/66.png) ;text-align:center;">
+<div id="areaA" style="position:absolute;left:500px;top:40%;"></div>
+<div id="regist" style="position:absolute;left:500px;top:40%;"></div>
+</body>
+	
+
+		<script type="text/javascript" charset="utf-8">
+		var code;
+	    function createCode(){
+	        //首先默认code为空字符串
+	        code = '';
+	        //设置长度，这里看需求，我这里设置了4
+	        var codeLength = 4;
+	        //设置随机字符
+	        var random = new Array(0,1,2,3,4,5,6,7,8,9,'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R', 'S','T','U','V','W','X','Y','Z');
+	        //循环codeLength 我设置的4就是循环4次
+	        for(var i = 0; i < codeLength; i++){
+	            //设置随机数范围,这设置为0 ~ 36
+	             var index = Math.floor(Math.random()*36);
+	             //字符串拼接 将每次随机的字符 进行拼接
+	             code += random[index]; 
+	        }
+	        
+	        return code;
+	    }
+	    
+	    	/**
+	    	*登录框
+	    	*/
+			webix.ui({
+				container:"areaA",
+				view:"form",
+				id:"form",
+				scroll:false,
+				width:300,
+				borderless:true,
+				elements:[
+					{ view:"fieldset", id:"fi",label:"登录", body:{
+						rows:[
+							{ view:"text",id:"t1", label:"用户名",name:"username"},
+							{ view:"text",id:"t2",type:"password", label:"密码",name:"password"},
+							{cols:[
+								{ view:"button",label:"注册" ,inputWidth:50,inputHeight:30, type:"form",css:"myClass2",click:"$$('form2').show();$$('form').hide();" },
+								{ view:"text",id:"texty",placeholder:"验证码",inputWidth:85,css:"myClass" },
+								{ view:"button", id:"yanzm",label:""+createCode()+"",
+								inputWidth:60,align:"right",click:"$$('yanzm').setValue(createCode())" }
+							]}
+						]
+					
+					}},
+					{ margin:5, cols:[
+						{ view:"button", label:"登录" , type:"form",on:{
+							onItemClick:function(){
+								var yanzm = $$('texty').getValue().toUpperCase();
+								if(yanzm!=code){
+									alert("验证码不正确!");
+									return;
+								}
+								webix.ajax().post("../user/UserLogin", $$("form").getValues(),{ 
+									success:function(text){
+										if(text=="true"){
+											alert("登录成功!");
+											window.location.href ='./supplier.html';
+										}else{
+											alert("登录失败!");
+											return;
+										}
+									},
+									error:function(){
+								    	alert("登录失败!");
+								    }
+								});
+							}
+						} },
+						{ view:"button", label:"重置",click:"$$('t1').setValue('');$$('t2').setValue('');" }
+					]}
+				]
+			});
+	    	
+			/**
+	    	*注册框
+	    	*/
+			webix.ui({
+				container:"regist",
+				view:"form",
+				id:"form2",
+				scroll:false,
+				width:300,
+				borderless:true,
+				elements:[
+					{ view:"fieldset", id:"fi2",label:"注册", body:{
+						rows:[
+							{ view:"text",id:"t3", label:"用户名",name:"username"},
+							{ view:"text",id:"t4",type:"password", label:"密码",name:"password"},
+							{ view:"text",id:"t5", label:"Email",name:"email"},
+							{cols:[
+								{ view:"button",label:"登录" ,inputWidth:50,inputHeight:30, type:"form",css:"myClass2",click:"$$('form').show();$$('form2').hide();" },
+								{ view:"text",id:"yanzm2", placeholder:"验证码",inputWidth:85,css:"myClass" },
+								{ view:"button", id:"yanf",label:"发送邮箱",
+								inputWidth:70,align:"right",on:{
+									onItemClick:function(){
+										$$('yanf').setValue('重新发送');
+										var email = $$('t5').getValue();
+										webix.ajax().post("../user/emailCode/"+email+"/"+createCode(),{ 
+											success:function(text){
+												if(text=="true"){
+													alert("发送成功!");
+												}else{
+													alert("发送失败!");
+													return;
+												}
+											},
+											error:function(){
+										    	alert("发送失败!");
+										    }
+										}
+										);
+									}
+								} }
+							]}
+						]
+					
+					}},
+					{ margin:5, cols:[
+						{ view:"button", label:"注册" , type:"form",on:{
+								onItemClick:function(){
+									var yanzm2 = $$('yanzm2').getValue().toUpperCase();
+									if(yanzm2!=code){
+										alert("验证码不正确!");
+										return;
+									}
+									webix.ajax().post("../user/registUser", $$("form2").getValues(),{ 
+										success:function(text){
+											if(text=="true"){
+												alert("注册成功!");
+												$$('form').show();
+												$$('form2').hide();
+											}else{
+												alert("注册失败!");
+												return;
+											}
+										},
+										error:function(){
+									    	alert("注册失败!");
+									    }
+									});
+								}
+							}
+						},
+						{ view:"button", label:"重置",click:"$$('t3').setValue('');$$('t4').setValue('');$$('t5').setValue('');" }
+					]}
+				]
+			}).hide();
+		</script>
+	</body>
+</html>
