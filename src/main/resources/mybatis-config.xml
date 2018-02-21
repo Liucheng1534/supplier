@@ -8,6 +8,6 @@
   		<setting name="loglmpl" value="STDOUT_LOGGING"/>
   	</settings>
   	<typeAliases>
-  		<package name="me.morikai.Bean"/>
+  		<package name="ruantong.supplier.Bean"/>
   	</typeAliases>
   </configuration>
