@@ -1,5 +1,6 @@
 package ruantong.supplier.Servser;
 
+import java.io.InputStream;
 import java.util.List;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -24,4 +25,7 @@ public interface SupplierService {
 
 	//导出表格模板
 	public HSSFWorkbook export(Class c, List<Supplier> list, String sheetName);
+
+	//批量导入
+	public void imports(InputStream inputStream) throws Exception;
 }

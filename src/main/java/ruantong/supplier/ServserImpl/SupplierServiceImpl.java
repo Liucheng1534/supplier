@@ -1,5 +1,6 @@
 package ruantong.supplier.ServserImpl;
 
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -92,6 +93,21 @@ public class SupplierServiceImpl implements SupplierService {
 			e.printStackTrace();
 		}
 		return workbook;
+	}
+
+
+	/**
+	 * 表格批量导入
+	 */
+	@Override
+	public void imports(InputStream inputStream) throws Exception {
+		List list = null;
+		list = PoiUtil.importExcel(Supplier.class, inputStream);
+		//循环导入
+		for (int i=0;i<list.size();i++){
+			Supplier o = (Supplier) list.get(i);
+			supplierDao.insert(o);
+		}
 	}
 
 	/**

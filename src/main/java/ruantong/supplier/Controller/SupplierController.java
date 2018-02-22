@@ -14,11 +14,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import org.springframework.web.multipart.MultipartFile;
 import ruantong.supplier.Bean.Supplier;
 import ruantong.supplier.Servser.SupplierService;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping(value="/supplier")
@@ -91,7 +93,10 @@ public class SupplierController {
 		return "demo1-22";
 	}
 
-
+	/**
+	 * 导出模板
+	 * @return
+	 */
 	@RequestMapping("/export")
 	public void export(String excelName, HttpServletResponse response){
 		ArrayList list = new ArrayList();
@@ -104,6 +109,12 @@ public class SupplierController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	@RequestMapping("/import")
+	public void importExcel(MultipartFile upload, HttpSession session) throws Exception {
+        String name = upload.getName();
+        supplierService.imports(upload.getInputStream());
 	}
 	
 }
