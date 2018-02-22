@@ -113,8 +113,11 @@ public class SupplierController {
 
 	@RequestMapping("/import")
 	public void importExcel(MultipartFile upload, HttpSession session) throws Exception {
-        String name = upload.getName();
-        supplierService.imports(upload.getInputStream());
-	}
+        try {
+            supplierService.imports(upload.getInputStream());
+        } catch (Exception e) {
+            throw new RuntimeException("文件格式不对");
+        }
+    }
 	
 }
